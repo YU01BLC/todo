@@ -1,0 +1,44 @@
+name: todo_workflow
+
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - develop
+
+jobs:
+  common_steps:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+
+  run_format:
+    needs: common_steps
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run format
+        run: npm run format
+
+  run_lint:
+    needs: common_steps
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run lint
+        run: npm run fix
+
+  run_test:
+    needs: common_steps
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run test
+        run: npm run test
