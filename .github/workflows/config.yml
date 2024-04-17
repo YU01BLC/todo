@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: Run lint
-        run: npm run fix
+        run: npm run lint:fix
 
   run_test:
     needs: common_steps
