@@ -1,3 +1,64 @@
 {
-  "extends": "next/core-web-vitals"
+  // ESLintの推奨設定を拡張
+  "extends": [
+    "eslint:recommended", // ESLintの推奨設定
+    "plugin:@typescript-eslint/recommended-type-checked", // 型チェック付きのTypeScript ESLintの推奨設定
+    "plugin:@typescript-eslint/stylistic-type-checked", // 型チェック付きのTypeScript ESLintのスタイルガイド設定
+    "plugin:tailwindcss/recommended", // Tailwind CSSの推奨設定
+    "next/core-web-vitals", // Next.jsのコアWebバイタルに関する推奨設定
+    "plugin:vitest/recommended", // Vitestの推奨設定
+    "prettier" // Prettierとの統合によるコードフォーマット設定
+  ],
+  // 使用するプラグインのリスト
+  "plugins": [
+    "@typescript-eslint", // TypeScript用のESLintプラグイン
+    "tailwindcss", // Tailwind CSS用のESLintプラグイン
+    "vitest" // Vitest用のESLintプラグイン
+  ],
+  // パーサの設定
+  "parser": "@typescript-eslint/parser", // TypeScript用のパーサ
+  "parserOptions": {
+    "project": true, // プロジェクト全体の設定を有効にする
+    "tsconfigRootDir": "__dirname" // tsconfig.jsonのルートディレクトリ
+  },
+  // ルート設定を有効にする
+  "root": true,
+  // Tailwind CSS用の追加設定
+  "settings": {
+    "tailwindcss": {
+      "callees": ["cn"], // Tailwind CSSクラス名の検出関数
+      "config": "tailwind.config.ts" // Tailwind CSSの設定ファイル
+    }
+  },
+  // ルールの設定
+  "rules": {
+    "import/order": [
+      "error", // インポートの順序に関するルールのエラーレベル
+      {
+        "pathGroups": [
+          {
+            "pattern": "@/**", // 特定のパスパターンのグループ化
+            "group": "internal" // 内部モジュールとしてグループ化
+          }
+        ],
+        "groups": [
+          "builtin", // 組み込みモジュール
+          "external", // 外部モジュール
+          "internal", // 内部モジュール
+          "parent", // 親ディレクトリからのインポート
+          "sibling", // 同一ディレクトリからのインポート
+          "index", // インデックスファイルからのインポート
+          "object" // オブジェクトスタイルのインポート
+        ],
+        "newlines-between": "always" // 各グループ間に常に改行を挿入
+      }
+    ]
+  },
+  // 特定のファイルに対する設定の上書き
+  "overrides": [
+    {
+      "extends": ["plugin:@typescript-eslint/disable-type-checked"], // 型チェックを無効にしたTypeScript ESLint設定を拡張
+      "files": ["./**/*.{js,cjs,mjs}"] // 対象ファイルのパターン
+    }
+  ]
 }
