@@ -1,60 +1,53 @@
 {
   "extends": [
-    "eslint:recommended", // ESLintの推奨設定
-    "plugin:@typescript-eslint/recommended-type-checked", // 型チェック付きのTypeScript ESLintの推奨設定
-    "plugin:@typescript-eslint/stylistic-type-checked", // 型チェック付きのTypeScript ESLintのスタイルガイド設定
-    "plugin:tailwindcss/recommended", // Tailwind CSSの推奨設定
-    "next/core-web-vitals", // Next.jsのコアWebバイタルに関する推奨設定
-    "plugin:vitest/recommended", // Vitestの推奨設定
-    "prettier" // Prettierとの統合によるコードフォーマット設定
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended-type-checked",
+    "plugin:@typescript-eslint/stylistic-type-checked",
+    "plugin:tailwindcss/recommended",
+    "next/core-web-vitals",
+    "plugin:vitest/recommended",
+    "prettier"
   ],
-  "plugins": [
-    "@typescript-eslint", // TypeScript用のESLintプラグイン
-    "tailwindcss", // Tailwind CSS用のESLintプラグイン
-    "vitest" // Vitest用のESLintプラグイン
-  ],
-  "parser": "@typescript-eslint/parser", // TypeScript用のパーサ
+  "plugins": ["@typescript-eslint", "tailwindcss", "vitest"],
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": true, // プロジェクト全体の設定を有効にする
-    "tsconfigRootDir": "__dirname" // tsconfig.jsonのルートディレクトリ
+    "project": true,
+    "tsconfigRootDir": "__dirname"
   },
-  "root": true, // ルート設定を有効にする
+  "root": true,
   "settings": {
     "tailwindcss": {
-      "callees": ["cn"], // Tailwind CSSクラス名の検出関数
-      "config": "tailwind.config.ts" // Tailwind CSSの設定ファイル
+      "callees": ["cn"],
+      "config": "tailwind.config.ts"
     }
   },
   "rules": {
     "import/order": [
-      // インポートの順序ルール
-      "error", // エラーレベル
+      "error",
       {
         "pathGroups": [
-          // パスグループ
           {
-            "pattern": "@/**", // 特定のパスパターン
-            "group": "internal" // 内部モジュールとしてグループ化
+            "pattern": "@/**",
+            "group": "internal"
           }
         ],
         "groups": [
-          // グループ設定
-          "builtin", // 組み込みモジュール
-          "external", // 外部モジュール
-          "internal", // 内部モジュール
-          "parent", // 親ディレクトリからのインポート
-          "sibling", // 同一ディレクトリからのインポート
-          "index", // インデックスファイルからのインポート
-          "object" // オブジェクトスタイルのインポート
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index",
+          "object"
         ],
-        "newlines-between": "always" // 各グループ間に常に改行を挿入
+        "newlines-between": "always"
       }
     ]
   },
   "overrides": [
     {
-      "extends": ["plugin:@typescript-eslint/disable-type-checked"], // 型チェックを無効にしたTypeScript ESLint設定を拡張
-      "files": ["src/**/*.ts", "src/**/*.tsx"] // 対象ファイルのパターン
+      "extends": ["plugin:@typescript-eslint/disable-type-checked"],
+      "files": ["src/**/*.ts", "src/**/*.tsx"]
     }
   ]
 }
