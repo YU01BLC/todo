@@ -60,23 +60,3 @@ jobs:
 
       - name: Run test
         run: npm run test -- src/
-
-  final_lint:
-    runs-on: ubuntu-latest
-    needs: [run_format, run_lint, run_test]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run final lint check
-        run: npm run lint
-        continue-on-error: true 
-
-      - name: Archive lint results
-        if: failure()
-        run: |
-          echo "Linting issues found. Please check the output above for details."
