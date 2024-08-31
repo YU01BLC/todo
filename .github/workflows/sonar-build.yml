@@ -8,47 +8,35 @@ jobs:
   sonarqube:
     name: SonarQube Scan
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
     
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Build Next.js app
-      run: npm run build
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
     - name: Start SonarQube
-      run: docker-compose up -d
-
-    - name: Wait for SonarQube to be ready
       run: |
-        timeout=300
-        while ! curl -s http://localhost:9000/api/system/status | grep '"status":"UP"'; do
-          if [ $timeout -le 0 ]; then
-            echo "Timed out waiting for SonarQube to start"
-            exit 1
-          fi
-          echo "Waiting for SonarQube to be ready..."
-          sleep 10
-          timeout=$((timeout - 10))
+        docker compose up -d
+        echo "Waiting for SonarQube to start..."
+        while ! curl -s http://localhost:9000 > /dev/null; do
+          sleep 5
         done
-
+        echo "SonarQube is up and running"
+    
     - name: SonarQube Scan
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
+        npm install
+        npm run build
         npx sonar-scanner \
           -Dsonar.projectKey=your_project_key \
           -Dsonar.sources=. \
           -Dsonar.host.url=http://localhost:9000 \
-          -Dsonar.token=$SONAR_TOKEN
+          -Dsonar.login=$SONAR_TOKEN
           
     - name: Check for Blockers
       run: |
