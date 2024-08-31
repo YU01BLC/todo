@@ -47,6 +47,13 @@ jobs:
         done
         echo "SonarQube is up and running"
     
+    - name: Debug SonarQube
+      run: |
+        docker compose ps
+        docker compose logs sonarqube
+        curl -v ${{ secrets.SONAR_HOST_URL }}
+        curl -v ${{ secrets.SONAR_TOKEN }}
+        
     - name: SonarQube Scan
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -58,11 +65,6 @@ jobs:
           -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
           -Dsonar.verbose=true
           
-    - name: Debug SonarQube
-      run: |
-        docker compose ps
-        docker compose logs sonarqube
-        curl -v ${{ secrets.SONAR_HOST_URL }}
 
     - name: Check for Blockers
       run: |
