@@ -41,8 +41,15 @@ jobs:
       run: |
         docker compose up -d
         echo "Waiting for SonarQube to start..."
-        while ! curl -s http://localhost:9000 > /dev/null; do
-          sleep 5
+        timeout=300
+        while ! curl -s http://localhost:9000/api/system/status | grep '"status":"UP"'; do
+          if [ $timeout -le 0 ]; then
+            echo "Timed out waiting for SonarQube to start"
+            exit 1
+          fi
+          echo "Waiting for SonarQube to be ready..."
+          sleep 10
+          timeout=$((timeout - 10))
         done
         echo "SonarQube is up and running"
     
@@ -54,8 +61,15 @@ jobs:
           -Dsonar.projectKey=your_project_key \
           -Dsonar.sources=. \
           -Dsonar.host.url=http://localhost:9000 \
-          -Dsonar.login=$SONAR_TOKEN
+          -Dsonar.token=$SONAR_TOKEN \
+          -Dsonar.verbose=true
           
+    - name: Debug SonarQube
+      run: |
+        docker compose ps
+        docker compose logs sonarqube
+        curl -v http://localhost:9000
+
     - name: Check for Blockers
       run: |
         BLOCKERS=$(curl -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/issues/search?componentKeys=${{ github.repository }}&severities=BLOCKER&statuses=OPEN" | jq '.total')
