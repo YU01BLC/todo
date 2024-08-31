@@ -19,20 +19,14 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Cache node modules
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-node-modules
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+    - name: Clear npm cache
+      run: npm cache clean --force
 
     - name: Install dependencies
-      run: npm ci --cache ~/.npm --prefer-offline
+      run: |
+        rm -rf node_modules
+        rm package-lock.json
+        npm install
 
     - name: Build Next.js app
       run: npm run build
