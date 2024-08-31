@@ -14,8 +14,25 @@ jobs:
       with:
         fetch-depth: 0
     
-    - name: Start SonarQube
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build Next.js app
+      run: npm run build
+      env:
+        NODE_ENV: production
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build and start Docker containers
       run: |
+        docker-compose build
         docker-compose up -d
         echo "Waiting for SonarQube to start..."
         while ! curl -s http://localhost:9000 > /dev/null; do
@@ -27,8 +44,6 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
-        npm install
-        npm run build
         npx sonar-scanner \
           -Dsonar.projectKey=your_project_key \
           -Dsonar.sources=. \
@@ -37,7 +52,7 @@ jobs:
           
     - name: Check for Blockers
       run: |
-        BLOCKERS=$(curl -u ${{ secrets.SONAR_TOKEN }}: "${{ secrets.SONAR_HOST_URL }}/api/issues/search?componentKeys=${{ github.repository }}&severities=BLOCKER&statuses=OPEN" | jq '.total')
+        BLOCKERS=$(curl -u ${{ secrets.SONAR_TOKEN }}: "http://localhost:9000/api/issues/search?componentKeys=${{ github.repository }}&severities=BLOCKER&statuses=OPEN" | jq '.total')
         if [ $BLOCKERS -gt 0 ]; then
           echo "There are $BLOCKERS blocker issues. Failing the workflow."
           exit 1
