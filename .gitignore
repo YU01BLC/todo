@@ -8,6 +8,8 @@
 
 # testing
 /coverage
+/.sonar/
+
 
 # next.js
 /.next/
