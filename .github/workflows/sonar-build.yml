@@ -8,7 +8,6 @@ jobs:
   sonarqube:
     name: SonarQube Scan
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v3
       with:
@@ -24,22 +23,7 @@ jobs:
 
     - name: Build Next.js app
       run: npm run build
-      env:
-        NODE_ENV: production
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Build and start Docker containers
-      run: |
-        docker compose build
-        docker compose up -d
-        echo "Waiting for SonarQube to start..."
-        while ! curl -s http://localhost:9000 > /dev/null; do
-          sleep 5
-        done
-        echo "SonarQube is up and running"
-    
     - name: SonarQube Scan
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
