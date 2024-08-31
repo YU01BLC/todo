@@ -1,0 +1,35 @@
+services: # 複数のサービス（コンテナ）を定義
+  nextjs: # Next.jsアプリケーションのサービスを定義
+    build: . # 現在のディレクトリにあるDockerfileを使用してイメージをビルド
+    ports:
+      - '3000:3000' # ホストのポート3000をコンテナのポート3000にバインドして、アプリケーションをアクセス可能する
+    volumes:
+      - .:/app # 現在のディレクトリをコンテナ内の/appディレクトリにマウントする。(これによりコードの変更が即座にコンテナに反映される)
+      - /app/node_modules # node_modulesディレクトリはホストと共有せず、コンテナ内でのみ管理される
+    environment:
+      - NODE_ENV=development # Node.jsの環境を開発モードに設定する()これにより開発に適した設定が適用される)
+      - DEBUG=true # アプリケーションのデバッグモードを有効する(詳細なログが出力される)
+      - SONAR_TOKEN=${SONAR_TOKEN} # sonarQubeのトークンを指定
+
+  sonarqube: # SonarQubeのサービスを定義
+    image: sonarqube:community # SonarQubeの公式コミュニティ版のイメージを使用
+    ports:
+      - '9000:9000' # ホストのポート9000をコンテナのポート9000にバインド(これによりSonarQubeのWeb UIにアクセス可能になる)
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true # SonarQubeがElasticsearchのチェックをスキップするように設定
+      - SONAR_JDBC_URL=jdbc:postgresql://db:5432/sonar # SonarQubeが接続するPostgreSQLデータベースのURLを設定
+      - SONAR_JDBC_USERNAME=sonar # データベースに接続するためのユーザー名を指定
+      - SONAR_JDBC_PASSWORD=sonar # データベースに接続するためのパスワードを指定
+    depends_on:
+      - db # SonarQubeサービスは、dbサービス（PostgreSQL）が起動してから起動するように依存関係を設定
+
+  db: # PostgreSQLデータベースのサービスを定義
+    image: postgres:alpine # 軽量なAlpine LinuxベースのPostgreSQLイメージを使用
+    environment:
+      - POSTGRES_USER=sonar # データベースに作成するユーザー名を指定
+      - POSTGRES_PASSWORD=sonar # データベースに作成するユーザーのパスワードを指定
+    volumes:
+      - sonar_data:/var/lib/postgresql/data # データベースのデータを永続化するためにボリュームをマウント
+
+volumes: # データ永続化のためのボリュームを定義
+  sonar_data: # PostgreSQLのデータを永続化するためのボリューム

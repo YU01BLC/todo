@@ -1,0 +1,74 @@
+# name: SonarQube Analysis
+
+# on:
+#   pull_request:
+#     types: [opened, synchronize, reopened]
+
+# jobs:
+#   sonarqube:
+#     name: SonarQube Scan
+#     runs-on: ubuntu-latest
+    
+#     steps:
+#     - uses: actions/checkout@v3
+#       with:
+#         fetch-depth: 0
+    
+#     - name: Use Node.js
+#       uses: actions/setup-node@v3
+#       with:
+#         node-version: '18'
+
+#     - name: Clear npm cache
+#       run: npm cache clean --force
+
+#     - name: Install dependencies
+#       run: |
+#         rm -rf node_modules
+#         rm package-lock.json
+#         npm install
+
+#     - name: Build Next.js app
+#       run: npm run build
+
+#     - name: Start SonarQube
+#       run: |
+#         docker compose up -d
+#         echo "Waiting for SonarQube to start..."
+#         timeout=300
+#         while ! curl -s ${{ secrets.SONAR_HOST_URL }}/api/system/status | grep '"status":"UP"'; do
+#           if [ $timeout -le 0 ]; then
+#             echo "Timed out waiting for SonarQube to start"
+#             exit 1
+#           fi
+#           echo "Waiting for SonarQube to be ready..."
+#           sleep 10
+#           timeout=$((timeout - 10))
+#         done
+#         echo "SonarQube is up and running"
+
+#     - name: SonarQube Scan
+#       env:
+#         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#         SONAR_HOST_URL: http://localhost:9000
+#       run: |
+#         npx sonar-scanner \
+#           -Dsonar.projectKey=your_project_key \
+#           -Dsonar.sources=. \
+#           -Dsonar.host.url=$SONAR_HOST_URL \
+#           -Dsonar.token=$SONAR_TOKEN \
+#           -Dsonar.verbose=true
+          
+
+#     - name: Check for Blockers
+#       run: |
+#         BLOCKERS=$(curl -u ${{ secrets.SONAR_TOKEN }}: "${{ secrets.SONAR_HOST_URL }}/api/issues/search?componentKeys=${{ github.repository }}&severities=BLOCKER&statuses=OPEN" | jq '.total')
+#         if [ $BLOCKERS -gt 0 ]; then
+#           echo "There are $BLOCKERS blocker issues. Failing the workflow."
+#           exit 1
+#         fi
+
+#     - name: Clean up Docker volumes
+#       run: |
+#         docker compose down --volumes --remove-orphans
+#         docker volume prune -f
