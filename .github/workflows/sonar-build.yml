@@ -24,15 +24,30 @@ jobs:
     - name: Build Next.js app
       run: npm run build
 
+    - name: Start SonarQube
+      run: docker-compose up -d
+
+    - name: Wait for SonarQube to be ready
+      run: |
+        timeout=300
+        while ! curl -s http://localhost:9000/api/system/status | grep '"status":"UP"'; do
+          if [ $timeout -le 0 ]; then
+            echo "Timed out waiting for SonarQube to start"
+            exit 1
+          fi
+          echo "Waiting for SonarQube to be ready..."
+          sleep 10
+          timeout=$((timeout - 10))
+        done
+
     - name: SonarQube Scan
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       run: |
         npx sonar-scanner \
           -Dsonar.projectKey=your_project_key \
           -Dsonar.sources=. \
-          -Dsonar.host.url=$SONAR_HOST_URL \
+          -Dsonar.host.url=http://localhost:9000 \
           -Dsonar.token=$SONAR_TOKEN
           
     - name: Check for Blockers
