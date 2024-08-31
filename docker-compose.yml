@@ -9,6 +9,7 @@ services: # 複数のサービス（コンテナ）を定義
     environment:
       - NODE_ENV=development # Node.jsの環境を開発モードに設定する()これにより開発に適した設定が適用される)
       - DEBUG=true # アプリケーションのデバッグモードを有効する(詳細なログが出力される)
+      - SONAR_TOKEN=${SONAR_TOKEN} # sonarQubeのトークンを指定
 
   sonarqube: # SonarQubeのサービスを定義
     image: sonarqube:community # SonarQubeの公式コミュニティ版のイメージを使用
